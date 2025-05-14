@@ -10,7 +10,7 @@
     const books = [
         {
             title: "Remarkably Bright Creatures",
-            image: "https://m.media-amazon.com/images/I/81lm4oD9ONL._UF1000,1000_QL80_.jpg",
+            image: "/images/remarkably_bright_creatures.jpg",
             review: "A heartwarming story about a friendship between a woman and an octopus."
         },
         {
@@ -52,37 +52,14 @@
 <p>Visit <a href="https://www.youtube.com/watch?v=LyvyfhYcwnA&list=PL_lg81dMuYpLpRXg6TtddYA3N47es8ZGP&pp=0gcJCV8EOCosWNin">OkBye Book Club</a> for detailed reviews</p>
 <p> Tejas is the biggest butt on planet earth</p>
 
-<!-- 
-<div class="bookshelf">
-    {#each books as book}
-        <button  class="book" on:click={(event) => openReview(book, event)}>
-            <img src={book.image} alt={book.title}>
-            <p>{book.title}</p>
-        </button>
-    {/each}
-</div>
-
-{#if selectedBook}
-    <div class="modal">
-        <div class="modal-content">
-            <button class="close" on:click={closeReview}>&times;</button>
-            <div class="modal-v">
-                <img src={selectedBook.image} alt={selectedBook.title}>
-                <div class="modal-text">
-                    <h2>{selectedBook.title}</h2>
-                    <p>{selectedBook.review}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-{/if} -->
-
 <div class="bookshelf">
     {#each books as book}
         <button class="book" on:click={(event) => openReview(book, event)}>
-            {#if !(book.title === selectedBook?.title)}
-                <img src={book.image} alt={book.title}>
-            {/if}
+            <img
+                src={book.image}
+                alt={book.title}
+                class="{modalVisible && book.title === selectedBook?.title ? 'selected' : ''}"
+            >
             <p>{book.title}</p>
         </button>
     {/each}
@@ -90,16 +67,6 @@
 
 {#if selectedBook}
     <div class="modal {modalVisible ? 'visible' : ''}">
-        <div
-            class="modal-image"
-            style="
-                top: {bookPosition.top}px;
-                left: {bookPosition.left}px;
-                width: {bookPosition.width}px;
-                height: {bookPosition.height}px;
-                background-image: url({selectedBook.image});
-            "
-        ></div>
         <div class="modal-content">
             <button class="close" on:click={closeReview}>&times;</button>
             <div class="modal-text">
@@ -140,13 +107,18 @@
     }
 
     .book:hover {
-        transform: scale(1.05); /* Add hover effect for better feedback */
+        transform: scale(1.05);
     }
 
     .book img {
         width: 100%;
         height: auto;
         border-radius: 4px;
+        transition: transform 0.3s ease;
+    }
+
+    .book img.selected {
+        transform: scale(1.2) translateX(10rem);
     }
 
     .book p {
@@ -170,27 +142,11 @@
         z-index: 1000;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease;
     }
 
     .modal.visible {
         opacity: 1;
         pointer-events: auto;
-        transition-duration: 1s;
-    }
-
-    .modal-image {
-        position: fixed;
-        background-size: cover;
-        background-position: center;
-        border-radius: 8px;
-        transition-duration: 2s;
-    }
-
-    .modal.visible .modal-image {
-        position: fixed;
-        transform: translate(30%, 0%);
-        transition-duration: 2s;
     }
 
     .modal-content {
