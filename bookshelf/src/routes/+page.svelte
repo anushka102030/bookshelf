@@ -1,11 +1,10 @@
 <script>
-    import { onMount } from "svelte";
     /**
 	 * @type {{ title: any; review: any; image?: string; } | null}
 	 */
     let selectedBook = null;
     let modalVisible = false;
-    let bookPosition = { top: 0, left: 0, width: 0, height: 0 };
+    let modalPosition = { top: 0, left: 0 }; // Store modal position
 
     const books = [
         {
@@ -25,26 +24,20 @@
 	 * @param {{ target: { getBoundingClientRect: () => any; }; } | any} [event]
 	 */
     function openReview(book, event) {
-        const rect = event.currentTarget.getBoundingClientRect();
-        bookPosition = {
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height
+        // Get the position of the clicked book's image
+        const rect = event.target.getBoundingClientRect();
+        modalPosition = {
+            top: rect.top + window.scrollY, // Account for scrolling
+            left: rect.right + 20 // Position the modal to the right of the image
         };
-        selectedBook = book;
 
-        // Add a slight delay to trigger the transition
-        setTimeout(() => {
-            modalVisible = true;
-        }, 10); // 10ms delay
+        selectedBook = book;
+        modalVisible = true;
     }
 
     function closeReview() {
         modalVisible = false;
-        setTimeout(() => {
-            selectedBook = null;
-        }, 300); // Wait for the animation to finish
+        selectedBook = null;
     }
 </script>
 
@@ -66,7 +59,10 @@
 </div>
 
 {#if selectedBook}
-    <div class="modal {modalVisible ? 'visible' : ''}">
+    <div
+        class="modal {modalVisible ? 'visible' : ''}"
+        style="top: {modalPosition.top}px; left: {modalPosition.left}px; position: absolute;"
+    >
         <div class="modal-content">
             <button class="close" on:click={closeReview}>&times;</button>
             <div class="modal-text">
@@ -130,11 +126,7 @@
 
     /* Modal styles */
     .modal {
-        position: relative;
-        bottom: 40em;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        position: absolute;
         background-color: rgba(0, 0, 0, 0.103);
         display:flex;
         justify-content: center;
